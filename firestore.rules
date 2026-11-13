@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // এই অ্যাপে Firebase Login নেই (নিজস্ব লগইন), তাই অ্যাপের কালেকশনগুলো ক্লায়েন্ট থেকে খোলা রাখতে হয়।
+    match /{col}/{doc=**} {
+      allow read, write: if col in [
+        'settings', 'users', 'products', 'categories', 'orders',
+        'notifications', 'messages', 'pages', 'ratings', 'pstats'
+      ];
+    }
+
+    // 🔒 শুধু সার্ভার (Admin SDK) ব্যবহার করে — ক্লায়েন্ট কখনো পড়তে/লিখতে পারবে না:
+    //   otps          → OTP কোডের হ্যাশ
+    //   push_tokens   → ডিভাইস টোকেন
+    // (তালিকায় না থাকা সব কালেকশন নিজে থেকেই বন্ধ)
+  }
+}
